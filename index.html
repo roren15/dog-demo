@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<style>
+  #img_dog {
+
+  }
+
+  .mg {
+    margin: 20px;
+  }
+
+  .circle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+  }
+
+  .inline {
+    display: inline-block;
+  }
+</style>
+<body>
+<div class="mg">
+  <h3 class="">左键标记,右键取消</h3>
+  <img id="img_dog" class="" src="assets/dog.jpg" width="800px" height="400px">
+  <br>
+  <button id="save" class="inline">保存</button>
+  <button id="clean" class="inline">清空</button>
+</div>
+</body>
+<script src="assets/jquery-3.3.1.js"></script>
+<script src="assets/js.cookie.js"></script>
+<script>
+  let lastAddCircle;
+  let index = 0;
+  const PositionKey = 'position';
+  const expires = 7;
+  let positionArray = [];
+
+  (function () {
+    //查看是否有缓存
+    if (getPosition()) {
+      positionArray = JSON.parse(getPosition())
+      for (let index in positionArray) {
+        setCircle(positionArray[index])
+      }
+    }
+    //设置点击事件
+    let dogImg = document.getElementById('img_dog')
+    let position = dogImg.addEventListener("click", getMousePos, false)
+    //右键点击取消
+    document.oncontextmenu = function (e) {
+      e.preventDefault();
+    }
+    document.onmousedown = function (e) {
+      if (e.button == 2) {
+        removeClick()
+      }
+    }
+    //保存
+    $('#save').click(function () {
+      setPosition(positionArray)
+      window.location.reload()
+    })
+    //清空
+    $('#clean').click(function () {
+      removePosition()
+      window.location.reload()
+    })
+  })()
+
+  function removeClick() {
+    // alert(lastAddCircle);
+    $('#circle_' + index).remove();
+    index--;
+    positionArray.pop()
+  }
+
+  function getMousePos(event) {
+    var e = event || window.event;
+    var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+    var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+    var x = (e.pageX || e.clientX + scrollX);
+    var y = (e.pageY || e.clientY + scrollY);
+    // alert('x: ' + x + '\ny: ' + y);
+    let position = {'x': x, 'y': y};
+    setCircle(position);
+    return position;
+  }
+
+  function setCircle(position) {
+    let x = position.x
+    let y = position.y
+    index++;
+    lastAddCircle = $('body').append('<div id="circle_' + index + '" class="circle" style="left: ' + (x - 5) + 'px;top: ' + (y - 5) + 'px;"></div>')
+    positionArray.push({'x': x, 'y': y})
+  }
+
+  function getPosition() {
+    return Cookies.get(PositionKey)
+  }
+
+  function setPosition(val) {
+    return Cookies.set(PositionKey, val, {expires: expires})
+  }
+
+  function removePosition() {
+    return Cookies.remove(PositionKey)
+  }
+</script>
+</html>
