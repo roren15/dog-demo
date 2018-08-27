@@ -21,6 +21,6 @@ done
 git pull
 
 # chmod
-if [ -a FILE ];then
-    chmod 777 FILE
+if [ -a ${FILE} ];then
+    chmod 777 ${FILE}
 fi
