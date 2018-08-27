@@ -16,8 +16,6 @@
 
   .circle {
     position: absolute;
-    width: 10px;
-    height: 10px;
     background-color: red;
     border-radius: 50%;
   }
@@ -30,6 +28,9 @@
 <body>
 <div class="mg">
   <h3 class="">左键标记,右键取消</h3>
+  <input type="text" name="changeCircleRadii" placeholder="5" value="5">
+  <button id="doChangeCircleRadii">改变粒度</button>
+  <br>
   <img id="img_dog" class="" src="assets/dog.jpg" width="800px" height="400px">
   <br>
   <button id="save" class="inline">保存</button>
@@ -45,6 +46,7 @@
   const PositionKey = 'position';
   const expires = 7;
   let positionArray = [];
+  let circleRadii = 5;
 
   (function () {
     //查看是否有缓存
@@ -63,9 +65,25 @@
     }
     document.onmousedown = function (e) {
       if (e.button == 2) {
+
+      }
+    }
+    dogImg.onmousedown = function (e) {
+      if (e.button == 2) {
         removeClick()
       }
     }
+    //选择circle粒度
+    $("#doChangeCircleRadii").click(function () {
+      circleRadii = $("input[name=changeCircleRadii]").val()
+    });
+    //删除circle
+    $('body').on('click', '.circle', function () {
+      console.log('circle click')
+      let removeIndex = $(this).data('index')
+      $(this).remove();
+      removeCircle(removeIndex)
+    })
     //保存
     $('#save').click(function () {
       setPosition(positionArray)
@@ -91,18 +109,39 @@
     var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
     var x = (e.pageX || e.clientX + scrollX);
     var y = (e.pageY || e.clientY + scrollY);
+    index++;
     // alert('x: ' + x + '\ny: ' + y);
-    let position = {'x': x, 'y': y};
+    let position = {
+      'index': index,
+      'circleRadii': circleRadii,
+      'x': x,
+      'y': y,
+    };
     setCircle(position);
     return position;
   }
 
   function setCircle(position) {
-    let x = position.x
-    let y = position.y
-    index++;
-    lastAddCircle = $('body').append('<div id="circle_' + index + '" class="circle" style="left: ' + (x - 5) + 'px;top: ' + (y - 5) + 'px;"></div>')
-    positionArray.push({'x': x, 'y': y})
+    let x = position.x;
+    let y = position.y;
+    let index = position.index;
+    let theCircleRadii = position.circleRadii;
+    lastAddCircle = $('body').append('<div id="circle_' + index + '" class="circle" data-index="' + index + '" style="left: ' + (x - theCircleRadii) + 'px;top: ' + (y - theCircleRadii) + 'px;width: ' + 2 * theCircleRadii + 'px;height: ' + 2 * theCircleRadii + 'px;"></div>')
+    positionArray.push({
+      'index': index,
+      'circleRadii': theCircleRadii,
+      'x': x,
+      'y': y
+    })
+  }
+
+  function removeCircle(removeIndex) {
+    let exist = positionArray.findIndex(val => {
+      return val.index === removeIndex;
+    })
+    if (exist !== -1) {
+      positionArray.splice(exist, 1)
+    }
   }
 
   function getPosition() {
