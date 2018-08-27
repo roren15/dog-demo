@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+FILE=gitPull.sh
+
 # Fetch the newest code
 git fetch
 
@@ -17,3 +19,8 @@ done
 
 # Finally pull all the changes (you could merge as well e.g. 'merge origin/master')
 git pull
+
+# chmod
+if [ -a FILE ];then
+    chmod 777 FILE
+fi
